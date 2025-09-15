@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malden Name Generator</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #ffb347, #ffcc33);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  h1 {
+    margin-top: 20px;
+    font-size: 2em;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    color: #fff;
+  }
+
+  .book-btn {
+    background: #ffd700;
+    color: #333;
+    border: none;
+    padding: 8px 20px;
+    margin-top: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .book-btn:hover {
+    background: #ffb800;
+    transform: scale(1.05);
+  }
+
+  .generator-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px 30px;
+    margin-top: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+  }
+
+  label {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  select, input[type="number"] {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  button {
+    background: #ff7f50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+  }
+
+  button:hover {
+    background: #ff4500;
+    transform: scale(1.05);
+  }
+
+  .names {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .name-item {
+    background: #fff3e0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+  }
+
+  .history-container {
+    margin-top: 25px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  }
+
+  .history-container h2 {
+    margin: 0 0 10px 0;
+    text-align: center;
+    color: #ff4500;
+  }
+
+  .history-list {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    background: #ffe0b2;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+
+  .copy-btn {
+    background: #ff7f50;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.8em;
+    cursor: pointer;
+  }
+
+  .copy-btn:hover {
+    background: #ff4500;
+  }
+
+</style>
+</head>
+<body>
+
+<h1>Malden Name Generator</h1>
+<a href="https://www.wattpad.com/story/401227872-kaiar-~-the-elder-amulets-book-one" class="book-btn">Go to Book</a>
+
+<div class="generator-container">
+  <label for="amount">Amount (1-10):</label>
+  <input type="number" id="amount" min="1" max="10" value="3">
+  <br>
+  <label for="prefix">Title Prefix:</label>
+  <select id="prefix">
+    <option value="">None</option>
+    <option value="mi-">Mage</option>
+    <option value="thy-">Elder</option>
+    <option value="va-">Noble</option>
+    <option value="zo-">Warrior</option>
+    <option value="co-">Commoner</option>
+    <option value="zi-">Scholar</option>
+    <option value="in-">Healer</option>
+    <option value="ar-">Leader</option>
+  </select>
+  <br>
+  <button onclick="generateNames()">Generate Names</button>
+
+  <div class="names" id="names"></div>
+</div>
+
+<div class="history-container">
+  <h2>History</h2>
+  <div class="history-list" id="history"></div>
+  <button onclick="clearHistory()">Clear History</button>
+</div>
+
+<script>
+  const liteAlphabet = [
+    "an","ba","su","o","he","se","ye","in","ē","ma","ka",
+    "r","m","i","a","pa","na","ya","ke","th","ü","vi",
+    "wo","zha","y","ga"
+  ];
+
+  let historyArray = [];
+
+  function getRandomElement(array, exclude = []) {
+    const filtered = array.filter(el => !exclude.includes(el));
+    return filtered[Math.floor(Math.random() * filtered.length)];
+  }
+
+  function generateSyllableName() {
+    let syllables = [];
+    for (let i = 0; i < 3; i++) {
+      syllables.push(getRandomElement(liteAlphabet, [syllables[syllables.length-1]]));
+    }
+    return syllables.join('');
+  }
+
+  function generateFullName(prefix = "") {
+    const firstName = generateSyllableName();
+    const lastName = generateSyllableName();
+    return `${prefix}${firstName} ${lastName}`;
+  }
+
+  function generateNames() {
+    const amount = parseInt(document.getElementById("amount").value) || 3;
+    const selectedPrefix = document.getElementById("prefix").value;
+    const namesDiv = document.getElementById("names");
+    namesDiv.innerHTML = "";
+
+    for (let i = 0; i < amount; i++) {
+      const fullName = generateFullName(selectedPrefix);
+      namesDiv.innerHTML += `<div class="name-item">${fullName} <button class="copy-btn" onclick="copyToClipboard('${fullName}')">Copy</button></div>`;
+      historyArray.unshift(fullName);
+    }
+
+    updateHistory();
+  }
+
+  function updateHistory() {
+    const historyDiv = document.getElementById("history");
+    historyDiv.innerHTML = "";
+    historyArray.forEach(name => {
+      historyDiv.innerHTML += `<div class="history-item">${name} <button class="copy-btn" onclick="copyToClipboard('${name}')">Copy</button></div>`;
+    });
+  }
+
+  function clearHistory() {
+    historyArray = [];
+    updateHistory();
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    alert(`Copied "${text}" to clipboard!`);
+  }
+</script>
+
+</body>
+</html>
